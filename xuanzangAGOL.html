@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
+
+    <style>
+	body, html {
+		margin: 0px;
+	}
+
+	header {
+		text-align: center;
+		background-color: #990000;
+		color: #d2bfac;
+		padding: 15px;
+		margin: 0px;
+		position: fixed;
+		top: 0;
+		width: 100%;
+	}
+
+	section {
+		margin: 120px 12.5% 10px;
+	}
+
+	#map {
+		width: 100%;
+		height: calc(100vh - 110px);
+	}
+    </style>
+	<link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.18/"></script>
+	
+	<script>
+      require([
+		"esri/config", "esri/Map", "esri/views/MapView", "esri/Graphic", "esri/layers/GraphicsLayer", "esri/PopupTemplate"
+		],
+		function(esriConfig,Map, MapView, Graphic, GraphicsLayer, PopupTemplate) {
+		
+		esriConfig.apiKey = "AAPKf8a5ac04b70e4f4d98a0d659a2f58ee2ZLHYHN76iL0AByTUZadTzKxTLkC6fKKpYxUFxiyspsjpm7EIj38u9a0K6BDWcybJ";
+		
+		const map = new Map({
+			basemap: "arcgis-imagery-standard" // Basemap Layer service
+		});
+		
+		const view = new MapView({
+			map: map,
+			center: [85.257, 36.731], // Longitude, Latitude
+			zoom: 5, // Zoom level
+			container: "map" // Target div element
+		});
+		
+		const graphicsLayer = new GraphicsLayer();
+		map.add(graphicsLayer);
+		  
+		var locations = [{
+				name: "Chang'an",
+				desc: "<div><br><p>Capital of the Tang dynasty and one of the largest cities of the ancient world. Xuanzang leaves illegally in 629 CE.</p></div>",
+				coords: [34.1269, 108.8668]
+			},
+			{
+				name: "Liangzhou",
+				desc: "<div><br><p></p></div>",
+				coords: [37.7531, 102.6325]
+			},
+			{
+				name: "Jade Gate",
+				desc: "<div><br><img src='https://upload.wikimedia.org/wikipedia/commons/e/e9/Yumenguan.jpg' title='Yumenguan (c) by Brookqi is licensed under CC BY-SA 3.0' style='display:block;margin:auto;' height='106' width='160'><p>A remote outpost often considered as the western limit of the Tang dynasty.</p></div>",
+				coords: [40.345383, 93.7747971]
+			},
+			{
+				name: "Hami",
+				desc: "<div><br><p>The oasis of Hami proved a welcome respite for Xuanzang, whose adventure beyond the limits of the Tang empire had begun rather ominously as he became lost in the desert and was abandoned by his companions.</p></div>",
+				coords: [43.0190461, 89.5272547]
+			},
+			{
+				name: "Turfan",
+				desc: "<div><br><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Turfan%2C_fiery_mountains%2C_caves%2C_Buddhist_IGP4252.jpg/1024px-Turfan%2C_fiery_mountains%2C_caves%2C_Buddhist_IGP4252.jpg' title='Turfan, fiery mountains, caves, Buddhist IGP4252 (c) by W0zny is licensed under CC BY-SA 3.0' style='display:block;margin:auto;' height='106' width='160'><p>Xuanzang arrived in Turfan in 630 CE. The king was a devout Buddhist, and gave him valuable gifts, a whole retinue of servants and horses to accompany him, and most importantly, a indispensable set of letters of introduction that would help guarantee Xuanzang safe passage under the name of the king.</p></div>",
+				coords: [42.4097113, 88.5198511]
+			},
+			{
+				name: "Kucha",
+				desc: "<div><br><p>His path forward blocked by heavy snow in the mountains, Xuanzang spent 2 months in the thriving kingdom of Kucha. The king, also a Buddhist, gave him a warm reception and Xuanzang visited several of the kingdom's many monasteries.</p></div>",
+				coords: [41.6982831, 82.2270443]
+			},
+			{
+				name: "Aksu",
+				desc: "<div><br>Lying at the foot of the Tian Shan mountain range, Aksu was the departure point for a difficult traversal. Cold and hunger whittled down fully a third of Xuanzang's retinue, but after 7 days they made it through.<p></p></div>",
+				coords: [41.0336452, 78.8144426]
+			},
+			{
+				name: "Tokmak",
+				desc: "<div><br><p>Near lake Issyk Kul in the Tian Shan mountains, Xuanzang met the Great Khan of the Western Turks. He presented the king of Turfan's letter of introduction to the Khan, who welcomed him with a banquet. When Xuanzang left, the Khan also gave him additional letters of introduction to help guarantee safe passage in several vassal kingdoms that he would pass through next.</p></div>",
+				coords: [42.8168054, 75.259003]
+			},
+			{
+				name: "Tashkent",
+				desc: "<div><br><p>Xuanzang had little to say about his passage from Tashken, depicting the area as a barren expanse.</p></div>",
+				coords: [41.2825125, 69.1392826]
+			},
+			{
+				name: "Samarkand",
+				desc: "<div><br><p>Samarkand was a bustling city of commerce during this time, and its people practiced Zoroastrianism rather than Buddhism, leading to an incident with some of Xuanzang's disciples. Fortunately, nothing serious occurred and from Samarkand, Xuanzang's path turned southwards, towards India.</p></div>",
+				coords: [39.6406042, 66.8278027]
+			},
+			{
+				name: "Kunduz",
+				desc: "<div><br><p>In Kunduz, Xuanzang found himself witness to a storm of political intrigue involving secret lovers, poison, and a coup by a prince.</p></div>",
+				coords: [36.7110325, 68.8129928]
+			},
+			{
+				name: "Balkh",
+				desc: "<div><br><p>Xuanzang took a detour to Balkh to see some of its many monasteries, numbering over 100. The land was also home to countless stupas, an iconic kind of Buddhist monument often containing sacred relics.</p></div>",
+				coords: [36.7571232, 66.8771481]
+			},
+			{
+				name: "Bamiyan",
+				desc: "<div><br><img src='https://upload.wikimedia.org/wikipedia/commons/2/21/Illustrated_London_News%2C_vol_89%2C_no_2481%2C_November_6%2C_1886_2.jpg' title='Engraving from a drawing by William Simpson and a sketch by P J Maitland, from The Illustrated London News, vol 89, no 2481, November 6, 1886. Scan via Getty. Public Domain.' style='display:block;margin:auto;' height='217' width='160'><p>Xuanzang came to see the fame Great Buddha statues of Bamiyan, 100+ foot giants carved into the cliff face.</p></div>",
+				coords: [34.8128019, 67.7863307]
+			},
+			{
+				name: "Kapisi",
+				desc: "<div><br><p>An old tale held that a Chinese prince held hostage in a monastery long before had left behind a buried treasure, to be dug up when the right time came. The right time of course just so happened to coincide with Xuanzang's stay in Kapisi, and he is said to have excavated a treasure of pearls and large quantities of gold.</p></div>",
+				coords: [34.9102744, 69.3234789]
+			},
+			{
+				name: "Nagarabhara",
+				desc: "<div><br><p>Xuanzang seems to have considered his arrival in Nagarabhara (modern Jalalabad) about 1 year after his departure as a key moment in his voyage to India, as his biographer prefaces this section with a lengthy overview of India and its people. From here, he would continue to travel for over a decade, staying in several of India's greatest Buddhist temples and spending time as the guest of kings.</p></div>",
+				coords: [34.4198223, 70.4365247]
+			},
+		];
+	
+		var polylineCoords = [];
+		var i;
+		for (i = 0; i < locations.length; i++) {
+			polylineCoords.push([locations[i].coords[1], locations[i].coords[0]]);
+		}
+		polyline = new Graphic({
+			geometry: {type: "polyline", paths: polylineCoords},
+			symbol: {type: "simple-line", color: "#ffcc00", width: 2}
+		});
+		
+		graphicsLayer.add(polyline);
+		
+		var popupTemplate = new PopupTemplate({
+			title: "{name}", 
+			content: "{description}"
+		}); 
+		for (i = 0; i < locations.length; i++) {
+			popupContent = {name: locations[i].name, description: locations[i].desc}
+			/* Note: description keeps returning a not defined error if included for reasons I can't figure out, 
+			but excluding it still doesn't get popups to work properly even with just a name (may be a required parameter).*/
+			point = new Graphic({
+				geometry: {type: "point", longitude: locations[i].coords[1], latitude: locations[i].coords[0]},
+				symbol: {type: "simple-marker", color: [226, 119, 40], outline: {color: [255, 255, 255], width: 1}},
+				attributes: popupContent,
+				popupTemplate: popupTemplate
+			});
+			graphicsLayer.add(point);
+			polylineCoords.push([locations[i].coords[1], locations[i].coords[0]]);
+		}
+      });		
+    </script>
+  </head>
+<body>
+	<header>
+		<h1>An Interactive Map of the Voyage of Xuanzang</h1>
+	</header>
+	<section>
+		<p>The buddhist monk Xuanzang is famous for his 7th century CE journey from China to India, with the goal of collecting Buddhist texts from their place of origin. His 16 year long journey took him from China, to Central Asia, to India, and eventually back again. The itinerary and information presented in this interactive map are taken from Sally Hovey Wriggin's biography, <i>Xuanzang: A Buddhist Pilgrim on the Silk Road</i>:</p>
+		<p>This map allows you to explore the first leg of Xuanzang's journey. Click on the markers below to learn more about his journey. Note that the route shown is highly approximate, only showing straight line paths between the locations Xuanzang visited and ignoring topography. The icon image is 'temple' by AFY Studio from the Noun Project.</p>
+		<p>Wriggins, Sally Hovey. <i>Xuanzang: A Buddhist Pilgrim on the Silk Road</i>. Boulder, CO: Westview Press, 1996. 
+	</section>
+	<div id="map"></div>
+</body>
+</html>
