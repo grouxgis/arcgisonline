@@ -1,0 +1,136 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>ArcGIS API for JavaScript Tutorials: Display a scene</title>
+  <style>
+    html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+	
+	#slider {
+		width: 60px;
+		height: 33vh;
+		border-radius: 10px;
+		text-align: center;
+	}
+	
+	#legend {
+		width: 200px;
+		height: auto;
+		border-radius: 10px;
+	}
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.18/"></script>
+
+  <script>
+    require([
+      "esri/config",
+      "esri/Map",
+      "esri/views/SceneView",
+	  "esri/views/ui/DefaultUI",
+	  "esri/layers/FeatureLayer",
+	  "esri/layers/MapImageLayer",
+	  "esri/renderers/Renderer",
+	  "esri/widgets/Slider",
+	  "esri/widgets/Legend"
+  ], function(esriConfig, Map, SceneView, DefaultUI, FeatureLayer, MapImageLayer, Renderer, Slider, Legend) {
+
+    esriConfig.apiKey = "AAPKf8a5ac04b70e4f4d98a0d659a2f58ee2ZLHYHN76iL0AByTUZadTzKxTLkC6fKKpYxUFxiyspsjpm7EIj38u9a0K6BDWcybJ";
+	
+    const map = new Map({
+      basemap: "arcgis-imagery-standard", //Basemap layer service
+      ground: "world-elevation", //Elevation service
+    });
+
+    const view = new SceneView({
+      container: "viewDiv",
+      map: map,
+      camera: {
+        position: {
+          x: -90.26487, //Longitude
+          y: 44.35824, //Latitude
+          z: 10000000 //Meters
+        },
+        tilt: 10
+      },
+	  environment: {
+		directShadowsEnabled: true,
+	  }
+      });
+	  
+	const slider = new Slider({
+		container: "slider",
+		label: "Opacity",
+		min: 0,
+		max: 100,
+		values: [ 100 ],
+		layout: "vertical",
+		visibleElements: {
+			label: true,
+			rangeLabels: true,
+		},
+		disabled: false,
+	});
+	  
+	const canada = new MapImageLayer({
+		url: "https://luna.flemingcollege.ca/arcgis/rest/services/Geom99lab1/CGrouxCanada/MapServer",
+		opacity: 1
+	}); 
+	
+	map.add(canada, 0)
+	
+	var renderer = {
+		type: "simple",
+		symbol: { type: "simple-fill", outline: { color: [255, 255, 255, 1], width: "0.2px"}},
+		visualVariables: [{
+			type: "color",
+			field: "Sovereignt",
+			stops: [
+				{ value: 3, color: "rgba(239, 243, 255, 0.5)" },
+				{ value: 7, color: "rgba(8, 81, 156, 0.5)" }
+			],
+		}]
+	};
+		
+	const sovereignty = new FeatureLayer({
+		portalItem: {
+			id: "d47f1083adac40dc95f4b5796b61ee95"
+		},
+		renderer: renderer
+	});
+	
+	map.add(sovereignty, 0)
+	
+	var legend = new Legend({
+		view: view,
+		container: "legend",
+		layerInfos: [{
+			layer: sovereignty,
+		}]
+	});
+	
+	view.ui.add(slider, "bottom-left");
+	view.ui.add(legend, "bottom-right");
+	
+	sliderchange = slider.on("thumb-drag", changeopacity)
+	
+	function changeopacity(evt) {
+		canada.opacity = (evt.value / 100);
+	}
+
+    });
+  </script>
+
+</head>
+<body>
+  <div id="viewDiv"></div>
+  <div id="slider"><h4>Opacity</h4></div>
+  <div id="legend"></div>
+</body>
+</html>
